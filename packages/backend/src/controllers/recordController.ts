@@ -26,4 +26,17 @@ export class RecordController {
       });
     }
   }
+
+  public async getAllRecords(req: Request, res: Response): Promise<void> {
+    try {
+      const records = await this.recordService.getAllRecords();
+      res.status(200).json(records);
+    } catch (error) {
+      console.error("Error fetching records:", error);
+      res.status(500).json({
+        error: "Failed to fetch records",
+        details: error instanceof Error ? error.message : "Unknown error",
+      });
+    }
+  }
 }

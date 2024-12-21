@@ -1,11 +1,36 @@
-import type { NextPage } from "next";
+import { useEffect, useState } from "react";
 import Head from "next/head";
-import { useState } from "react";
-import RecordForm from "@/components/RecordForm";
+import type { NextPage } from "next";
 import Modal from "@/components/Modal";
+import RecordForm from "@/components/RecordForm";
+import { RecordOut } from "@privasee/types";
+import RecordList from "@/components/RecordsList";
 
 const Home: NextPage = () => {
+  const [records, setRecords] = useState<RecordOut[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const fetchRecords = async () => {
+    try {
+      const response = await fetch("http://localhost:3001/api/records");
+      if (!response.ok) {
+        throw new Error("Failed to fetch records");
+      }
+      const data = await response.json();
+      setRecords(data);
+      setError(null);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "An error occurred");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchRecords();
+  }, []);
 
   return (
     <div>
@@ -71,6 +96,10 @@ const Home: NextPage = () => {
               </div>
             </div>
           </div>
+
+          <div className="bg-white rounded-lg shadow mt-4">
+            <RecordList records={records} loading={loading} error={error} />
+          </div>
         </div>
       </main>
 
@@ -79,7 +108,12 @@ const Home: NextPage = () => {
         onClose={() => setIsModalOpen(false)}
         title="Add New Question"
       >
-        <RecordForm onSuccess={() => setIsModalOpen(false)} />
+        <RecordForm
+          onSuccess={() => {
+            setIsModalOpen(false);
+            fetchRecords();
+          }}
+        />
       </Modal>
     </div>
   );

@@ -1,10 +1,8 @@
-import { RecordIn } from "@privasee/types";
+import { RecordIn, RecordOut, User } from "@privasee/types";
 import { airtable } from "../config/airtable";
 
 export class RecordService {
   private static instance: RecordService;
-  private lastRecordId: number = 0;
-
   private constructor() {}
 
   public static getInstance(): RecordService {
@@ -14,27 +12,40 @@ export class RecordService {
     return RecordService.instance;
   }
 
-  private async getNextRecordId(): Promise<number> {
-    if (this.lastRecordId === 0) {
-      // Fetch the highest record ID from Airtable
+  public async getAllRecords(): Promise<RecordOut[]> {
+    try {
+      console.log("Fetching all records from Airtable...");
+
       const records = await airtable("questions_answers")
         .select({
-          fields: ["_recordId"],
           sort: [{ field: "_recordId", direction: "desc" }],
-          maxRecords: 1,
         })
-        .firstPage();
+        .all();
 
-      this.lastRecordId = records[0]
-        ? Number(records[0].get("_recordId")) || 0
-        : 0;
+      console.log(`Found ${records.length} records`);
+
+      return records.map((record) => ({
+        _recordId: record.get("_recordId") as number,
+        companyName: record.get("companyName") as string,
+        _companyId: record.get("_companyId") as number,
+        question: record.get("question") as string,
+        answer: record.get("answer") as string,
+        createdAt: record.get("createdAt") as string,
+        createdBy: record.get("createdBy") as User,
+        updatedAt: record.get("updatedAt") as string,
+        updatedBy: record.get("updatedBy") as User,
+        assignedTo: record.get("assignedTo") as User,
+        properties: record.get("properties") as string,
+        questionDescription: record.get("questionDescription") as string,
+      }));
+    } catch (error) {
+      console.error("Error fetching records:", error);
+      throw error;
     }
-
-    return ++this.lastRecordId;
   }
 
   public async createRecord(record: RecordIn): Promise<RecordIn> {
-    const airtableRecord = await airtable("questions_answers").create({
+    await airtable("questions_answers").create({
       question: record.question,
       answer: record.answer || "",
       properties: record.properties,
