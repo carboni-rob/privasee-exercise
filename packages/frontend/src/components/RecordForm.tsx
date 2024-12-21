@@ -2,7 +2,11 @@ import React, { useState } from "react";
 import { RecordIn, PropertyPair } from "@privasee/types";
 import PropertyInput from "./PropertyInput";
 
-const RecordForm: React.FC = () => {
+interface RecordFormProps {
+  onSuccess: () => void;
+}
+
+const RecordForm = ({ onSuccess }: RecordFormProps) => {
   const [formData, setFormData] = useState<Partial<RecordIn>>({
     question: "",
     properties: "",
@@ -54,6 +58,8 @@ const RecordForm: React.FC = () => {
         questionDescription: "",
       });
       setPropertyPairs([]);
+
+      setTimeout(onSuccess, 1500); // Give time to show success message
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred");
     }
