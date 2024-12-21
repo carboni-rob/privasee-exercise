@@ -6,7 +6,7 @@
     "packages/*"
   ],
   "scripts": {
-    "dev": "concurrently \"npm run dev -w @privasee/backend\" \"npm run dev -w @privasee/frontend\"",
+    "dev": "concurrently \"npm run dev -w @privasee/types\" \"npm run dev -w @privasee/backend\" \"npm run dev -w @privasee/frontend\"",
     "build": "npm run build --workspaces",
     "lint": "npm run lint --workspaces",
     "test": "npm run test --workspaces"

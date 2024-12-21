@@ -1,4 +1,6 @@
+import Link from "next/link";
 import { useUser } from "@auth0/nextjs-auth0/client";
+import RecordForm from "@/components/RecordForm";
 
 export default function Index() {
   const { user, error, isLoading } = useUser();
@@ -7,12 +9,8 @@ export default function Index() {
   if (error) return <div>{error.message}</div>;
 
   if (user) {
-    return (
-      <div>
-        Welcome {user.name}! <a href="/api/auth/logout">Logout</a>
-      </div>
-    );
+    return <RecordForm />;
   }
 
-  return <a href="/api/auth/login">Login</a>;
+  return <Link href="/api/auth/login">Login</Link>;
 }
