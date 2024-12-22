@@ -98,7 +98,12 @@ const Home: NextPage = () => {
           </div>
 
           <div className="bg-white rounded-lg shadow mt-4">
-            <RecordList records={records} loading={loading} error={error} />
+            <RecordList
+              records={records}
+              loading={loading}
+              error={error}
+              onRecordsUpdated={fetchRecords}
+            />
           </div>
         </div>
       </main>

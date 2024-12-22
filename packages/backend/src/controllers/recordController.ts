@@ -106,4 +106,36 @@ export class RecordController {
       }
     }
   }
+
+  public async bulkAssign(req: Request, res: Response): Promise<void> {
+    try {
+      const { recordIds, assignedTo, updatedBy } = req.body;
+
+      if (!Array.isArray(recordIds) || recordIds.length === 0) {
+        res
+          .status(400)
+          .json({ error: "Record IDs must be provided as an array" });
+        return;
+      }
+
+      if (!assignedTo) {
+        res.status(400).json({ error: "assignedTo must be provided" });
+        return;
+      }
+
+      if (!updatedBy) {
+        res.status(400).json({ error: "updatedBy must be provided" });
+        return;
+      }
+
+      await this.recordService.bulkAssign(recordIds, assignedTo, updatedBy);
+      res.status(200).json({ message: "Records updated successfully" });
+    } catch (error) {
+      console.error("Error bulk assigning records:", error);
+      res.status(500).json({
+        error: "Failed to update records",
+        details: error instanceof Error ? error.message : "Unknown error",
+      });
+    }
+  }
 }

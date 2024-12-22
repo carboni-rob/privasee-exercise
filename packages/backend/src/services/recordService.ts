@@ -173,4 +173,42 @@ export class RecordService {
       throw error;
     }
   }
+
+  public async bulkAssign(
+    recordIds: number[],
+    assignedTo: string,
+    updatedBy: string
+  ): Promise<void> {
+    try {
+      console.log(
+        `Bulk assigning records ${recordIds.join(", ")} to ${assignedTo}`
+      );
+
+      // Fetch all records that match the IDs
+      const records = await airtable("questions_answers")
+        .select({
+          filterByFormula: `OR(${recordIds
+            .map((id) => `{_recordId} = ${id}`)
+            .join(",")})`,
+        })
+        .all();
+
+      if (!records || records.length === 0) {
+        throw new Error("No records found for the provided IDs");
+      }
+
+      // Update each record with the new assignee
+      const updates = records.map((record) => ({
+        id: record.id,
+        fields: {
+          assignedTo,
+        },
+      }));
+
+      await airtable("questions_answers").update(updates);
+    } catch (error) {
+      console.error("Error bulk assigning records:", error);
+      throw error;
+    }
+  }
 }
