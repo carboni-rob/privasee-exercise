@@ -42,13 +42,13 @@ const RecordList: React.FC<RecordListProps> = ({ records, loading, error }) => {
               scope="col"
               className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
             >
-              Assigned To
+              Created by
             </th>
             <th
               scope="col"
               className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
             >
-              Created by
+              Assigned To
             </th>
             <th
               scope="col"
@@ -80,14 +80,14 @@ const RecordList: React.FC<RecordListProps> = ({ records, loading, error }) => {
                   </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
+                  <UserChip user={creatingUser} />
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap">
                   {assignedUser ? (
                     <UserChip user={assignedUser} />
                   ) : (
                     <UnassignedChip />
                   )}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <UserChip user={creatingUser} />
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                   {formatDate(record.createdAt)}
