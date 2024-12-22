@@ -6,6 +6,7 @@ import { RecordOut } from "@privasee/types";
 import { useAuth0Users } from "@/contexts/Auth0UsersContext";
 import UserChip from "@/components/UserChip";
 import UnassignedChip from "@/components/UnassignedChip";
+import ConfirmationModal from "@/components/ConfirmationModal";
 
 const LoadingSkeleton = () => (
   <div className="animate-pulse">
@@ -28,6 +29,29 @@ const RecordDetails = () => {
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+
+  const handleDelete = async () => {
+    setDeleting(true);
+    try {
+      const response = await fetch(`http://localhost:3001/api/records/${id}`, {
+        method: "DELETE",
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to delete record");
+      }
+
+      // Redirect to home page after successful deletion
+      router.push("/");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to delete record");
+      setIsDeleteModalOpen(false);
+    } finally {
+      setDeleting(false);
+    }
+  };
 
   // Form state
   const [formData, setFormData] = useState<Partial<RecordOut>>({});
@@ -118,7 +142,7 @@ const RecordDetails = () => {
   return (
     <>
       <Head>
-        <title>Record Details</title>
+        <title>Record Details - {record.question}</title>
       </Head>
 
       <div className="min-h-screen bg-gray-50 py-6">
@@ -159,17 +183,37 @@ const RecordDetails = () => {
               <h1 className="text-2xl font-bold text-gray-900">
                 Record Details
               </h1>
-              <button
-                onClick={() => setEditing(!editing)}
-                className={`px-4 py-2 rounded-md ${
-                  editing
-                    ? "bg-gray-200 hover:bg-gray-300 text-gray-700"
-                    : "bg-blue-600 hover:bg-blue-700 text-white"
-                }`}
-              >
-                {editing ? "Cancel" : "Edit"}
-              </button>
+              <div className="flex space-x-3">
+                <button
+                  onClick={() => setEditing(!editing)}
+                  className={`px-4 py-2 rounded-md ${
+                    editing
+                      ? "bg-gray-200 hover:bg-gray-300 text-gray-700"
+                      : "bg-blue-600 hover:bg-blue-700 text-white"
+                  }`}
+                >
+                  {editing ? "Cancel" : "Edit"}
+                </button>
+                {!editing && (
+                  <button
+                    onClick={() => setIsDeleteModalOpen(true)}
+                    className="px-4 py-2 rounded-md bg-red-600 hover:bg-red-700 text-white"
+                  >
+                    Delete
+                  </button>
+                )}
+              </div>
             </div>
+
+            {/* Delete Confirmation Modal */}
+            <ConfirmationModal
+              isOpen={isDeleteModalOpen}
+              onClose={() => setIsDeleteModalOpen(false)}
+              onConfirm={handleDelete}
+              title="Delete Record"
+              message="Are you sure you want to delete this record? This action cannot be undone."
+              loading={deleting}
+            />
 
             <form onSubmit={handleSubmit}>
               <div className="space-y-6">
@@ -284,19 +328,17 @@ const RecordDetails = () => {
                     />
                   ) : (
                     <div className="space-y-1">
-                      {record.properties &&
-                        record.properties.split(",").map((prop, index) => {
-                          const [key, value] = prop.split(":");
-                          return (
-                            <div
-                              key={index}
-                              className="inline-block mr-2 mb-2 px-2 py-1 bg-gray-100 rounded-md text-sm"
-                            >
-                              <span className="font-medium">{key}:</span>{" "}
-                              {value}
-                            </div>
-                          );
-                        })}
+                      {record.properties?.split(",").map((prop, index) => {
+                        const [key, value] = prop.split(":");
+                        return (
+                          <div
+                            key={index}
+                            className="inline-block mr-2 mb-2 px-2 py-1 bg-gray-100 rounded-md text-sm"
+                          >
+                            <span className="font-medium">{key}:</span> {value}
+                          </div>
+                        );
+                      })}
                     </div>
                   )}
                 </div>

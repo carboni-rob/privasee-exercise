@@ -150,4 +150,27 @@ export class RecordService {
       throw error;
     }
   }
+
+  public async deleteRecord(recordId: number): Promise<void> {
+    try {
+      console.log(`Deleting record ${recordId}`);
+
+      // Find the record in Airtable
+      const records = await airtable("questions_answers")
+        .select({
+          filterByFormula: `{_recordId} = ${recordId}`,
+        })
+        .firstPage();
+
+      if (!records || records.length === 0) {
+        throw new Error(`Record with ID ${recordId} not found`);
+      }
+
+      // Delete the record
+      await airtable("questions_answers").destroy([records[0].id]);
+    } catch (error) {
+      console.error("Error deleting record:", error);
+      throw error;
+    }
+  }
 }

@@ -80,4 +80,30 @@ export class RecordController {
       });
     }
   }
+
+  public async deleteRecord(req: Request, res: Response): Promise<void> {
+    try {
+      const recordId = parseInt(req.params.id);
+      if (isNaN(recordId)) {
+        res.status(400).json({ error: "Invalid record ID" });
+        return;
+      }
+
+      await this.recordService.deleteRecord(recordId);
+      res.status(204).send();
+    } catch (error) {
+      console.error("Error deleting record:", error);
+      if (error instanceof Error && error.message.includes("not found")) {
+        res.status(404).json({
+          error: "Record not found",
+          details: error.message,
+        });
+      } else {
+        res.status(500).json({
+          error: "Failed to delete record",
+          details: error instanceof Error ? error.message : "Unknown error",
+        });
+      }
+    }
+  }
 }
