@@ -5,16 +5,12 @@ import Modal from "@/components/Modal";
 import RecordForm from "@/components/RecordForm";
 import { RecordOut } from "@privasee/types";
 import RecordList from "@/components/RecordsList";
-import { useUsers } from "@/services/auth0";
 
 const Home: NextPage = () => {
   const [records, setRecords] = useState<RecordOut[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-
-  const users = useUsers();
-  console.log(users);
 
   const fetchRecords = async () => {
     try {

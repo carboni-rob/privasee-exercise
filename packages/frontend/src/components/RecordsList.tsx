@@ -2,6 +2,9 @@ import React from "react";
 import { RecordOut } from "@privasee/types";
 import Spinner from "./Spinner";
 import { formatDate } from "@/utils/dateFormatters";
+import { useAuth0Users } from "@/contexts/Auth0UsersContext";
+import UserChip from "./UserChip";
+import UnassignedChip from "./UnassignedChip";
 
 interface RecordListProps {
   records: RecordOut[];
@@ -10,6 +13,8 @@ interface RecordListProps {
 }
 
 const RecordList: React.FC<RecordListProps> = ({ records, loading, error }) => {
+  const { users } = useAuth0Users();
+
   if (loading) {
     return <Spinner />;
   }
@@ -57,35 +62,44 @@ const RecordList: React.FC<RecordListProps> = ({ records, loading, error }) => {
           </tr>
         </thead>
         <tbody className="bg-white divide-y divide-gray-200">
-          {records.map((record) => (
-            <tr key={record._recordId} className="hover:bg-gray-50">
-              <td className="px-6 py-4">
-                <div className="max-w-md">
-                  <div className="text-sm text-gray-500 font-semibold">
-                    {record.question}
+          {records.map((record) => {
+            const assignedUser = users.find(
+              (user) => user.email === record.assignedTo
+            );
+            const creatingUser = users.find(
+              (user) => user.email === record.createdBy
+            );
+
+            return (
+              <tr key={record._recordId} className="hover:bg-gray-50">
+                <td className="px-6 py-4">
+                  <div className="max-w-md">
+                    <div className="text-sm text-gray-500 font-semibold">
+                      {record.question}
+                    </div>
                   </div>
-                </div>
-              </td>
-              <td className="px-6 py-4 whitespace-nowrap">
-                <div className="text-sm font-medium text-gray-900">
-                  {record.assignedTo ?? "Unassigned"}
-                </div>
-              </td>
-              <td className="px-6 py-4 whitespace-nowrap">
-                <div className="text-sm font-medium text-gray-900">
-                  {record.createdBy}
-                </div>
-              </td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                {formatDate(record.createdAt)}
-              </td>
-              <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                <button className="text-blue-600 hover:text-blue-900">
-                  Edit
-                </button>
-              </td>
-            </tr>
-          ))}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  {assignedUser ? (
+                    <UserChip user={assignedUser} />
+                  ) : (
+                    <UnassignedChip />
+                  )}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <UserChip user={creatingUser} />
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  {formatDate(record.createdAt)}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                  <button className="text-blue-600 hover:text-blue-900">
+                    Edit
+                  </button>
+                </td>
+              </tr>
+            );
+          })}
         </tbody>
       </table>
     </div>
