@@ -1,9 +1,3 @@
-export interface User {
-  id: string;
-  email: string;
-  name: string;
-}
-
 export interface RecordOut {
   _recordId?: number;
   companyName: string;
@@ -11,10 +5,10 @@ export interface RecordOut {
   question: string;
   answer?: string;
   createdAt: string;
-  createdBy: User;
+  createdBy: string;
   updatedAt?: string;
-  updatedBy?: User;
-  assignedTo?: User;
+  updatedBy?: string;
+  assignedTo?: string;
   properties: string;
   questionDescription?: string;
 }
@@ -22,6 +16,9 @@ export interface RecordOut {
 export interface RecordIn {
   question: string;
   answer?: string;
+  createdBy: string;
+  updatedBy: string;
+  assignedTo: string;
   properties: string;
   questionDescription?: string;
 }

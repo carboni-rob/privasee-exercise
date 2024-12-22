@@ -1,15 +1,20 @@
 import React, { useState } from "react";
 import { RecordIn, PropertyPair } from "@privasee/types";
 import PropertyInput from "./PropertyInput";
+import { useUser } from "@auth0/nextjs-auth0/client";
 
 interface RecordFormProps {
   onSuccess: () => void;
 }
 
 const RecordForm = ({ onSuccess }: RecordFormProps) => {
+  const { user } = useUser();
+
   const [formData, setFormData] = useState<Partial<RecordIn>>({
     question: "",
     properties: "",
+    createdBy: user?.email ?? "",
+    updatedBy: user?.email ?? "",
     questionDescription: "",
   });
   const [propertyPairs, setPropertyPairs] = useState<PropertyPair[]>([]);

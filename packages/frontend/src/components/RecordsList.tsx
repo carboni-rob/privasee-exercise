@@ -68,12 +68,12 @@ const RecordList: React.FC<RecordListProps> = ({ records, loading, error }) => {
               </td>
               <td className="px-6 py-4 whitespace-nowrap">
                 <div className="text-sm font-medium text-gray-900">
-                  {record.assignedTo?.name ?? "Unassigned"}
+                  {record.assignedTo ?? "Unassigned"}
                 </div>
               </td>
               <td className="px-6 py-4 whitespace-nowrap">
                 <div className="text-sm font-medium text-gray-900">
-                  {record.createdBy.name}
+                  {record.createdBy}
                 </div>
               </td>
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">

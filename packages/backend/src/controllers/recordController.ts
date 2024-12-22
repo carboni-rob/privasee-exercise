@@ -13,6 +13,7 @@ export class RecordController {
       const record = await this.recordService.createRecord({
         ...req.body,
         createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
         companyName: "Test Company", // As per requirements
         _companyId: Math.floor(Math.random() * 1000000), // Random company ID
       });
