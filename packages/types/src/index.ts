@@ -27,3 +27,15 @@ export interface PropertyPair {
   key: string;
   value: string;
 }
+
+export interface Auth0User {
+  user_id: string;
+  email: string;
+  name?: string;
+  picture?: string;
+  nickname?: string;
+  created_at: string;
+  updated_at: string;
+  last_login?: string;
+  email_verified: boolean;
+}

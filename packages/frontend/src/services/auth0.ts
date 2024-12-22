@@ -1,3 +1,4 @@
+import { Auth0User } from "@privasee/types";
 import { useCallback, useEffect, useState } from "react";
 
 const options = {
@@ -9,7 +10,7 @@ const options = {
 };
 
 export const useUsers = () => {
-  const [users, setUsers] = useState();
+  const [users, setUsers] = useState<Auth0User[]>([]);
 
   const getUsers = useCallback(async () => {
     try {
