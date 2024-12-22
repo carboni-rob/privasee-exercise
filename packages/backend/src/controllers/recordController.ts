@@ -28,6 +28,46 @@ export class RecordController {
     }
   }
 
+  public async getRecord(req: Request, res: Response): Promise<void> {
+    try {
+      const recordId = parseInt(req.params.id);
+      const record = await this.recordService.getRecord(recordId);
+      res.json(record);
+    } catch (error) {
+      console.error("Error retrieving record:", error);
+      res.status(500).json({
+        error: "Failed to retrieve record",
+        details: error instanceof Error ? error.message : "Unknown error",
+      });
+    }
+  }
+
+  public async updateRecord(req: Request, res: Response): Promise<void> {
+    try {
+      const recordId = parseInt(req.params.id);
+      if (isNaN(recordId)) {
+        res.status(400).json({ error: "Invalid record ID" });
+        return;
+      }
+
+      const record = await this.recordService.updateRecord(recordId, req.body);
+      res.status(200).json(record);
+    } catch (error) {
+      console.error("Error updating record:", error);
+      if (error instanceof Error && error.message.includes("not found")) {
+        res.status(404).json({
+          error: "Record not found",
+          details: error.message,
+        });
+      } else {
+        res.status(500).json({
+          error: "Failed to update record",
+          details: error instanceof Error ? error.message : "Unknown error",
+        });
+      }
+    }
+  }
+
   public async getAllRecords(req: Request, res: Response): Promise<void> {
     try {
       const records = await this.recordService.getAllRecords();

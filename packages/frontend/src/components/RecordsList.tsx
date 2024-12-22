@@ -5,6 +5,7 @@ import { formatDate } from "@/utils/dateFormatters";
 import { useAuth0Users } from "@/contexts/Auth0UsersContext";
 import UserChip from "./UserChip";
 import UnassignedChip from "./UnassignedChip";
+import Link from "next/link";
 
 interface RecordListProps {
   records: RecordOut[];
@@ -94,7 +95,9 @@ const RecordList: React.FC<RecordListProps> = ({ records, loading, error }) => {
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                   <button className="text-blue-600 hover:text-blue-900">
-                    Edit
+                    <Link href={`/question/${record._recordId}`}>
+                      View/Edit
+                    </Link>
                   </button>
                 </td>
               </tr>
