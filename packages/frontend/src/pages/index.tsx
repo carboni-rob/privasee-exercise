@@ -1,23 +1,44 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Head from "next/head";
 import type { NextPage } from "next";
 import Modal from "@/components/Modal";
 import RecordForm from "@/components/RecordForm";
 import { RecordOut } from "@privasee/types";
 import RecordList from "@/components/RecordsList";
+import OwnerFilterDropdown from "@/components/OwnerFilterDropdown";
 
 const Home: NextPage = () => {
   const [records, setRecords] = useState<RecordOut[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedOwners, setSelectedOwners] = useState<string[]>([]);
+  const [searchQuery, setSearchQuery] = useState("");
 
-  const fetchRecords = async () => {
+  const fetchRecords = useCallback(async () => {
+    setLoading(true);
     try {
-      const response = await fetch("http://localhost:3001/api/records");
+      // Build query parameters
+      const params = new URLSearchParams();
+
+      if (selectedOwners.length > 0) {
+        params.append("assignedTo", selectedOwners.join(","));
+      }
+
+      if (searchQuery.trim()) {
+        params.append("search", searchQuery.trim());
+      }
+
+      const queryString = params.toString();
+      const url = `http://localhost:3001/api/records${
+        queryString ? `?${queryString}` : ""
+      }`;
+
+      const response = await fetch(url);
       if (!response.ok) {
         throw new Error("Failed to fetch records");
       }
+
       const data = await response.json();
       setRecords(data);
       setError(null);
@@ -26,11 +47,11 @@ const Home: NextPage = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [searchQuery, selectedOwners]);
 
   useEffect(() => {
     fetchRecords();
-  }, []);
+  }, [selectedOwners, searchQuery, fetchRecords]);
 
   return (
     <div>
@@ -76,27 +97,28 @@ const Home: NextPage = () => {
             </div>
           </div>
 
-          {/* Table header */}
+          {/* Search and filters */}
           <div className="bg-white p-4 rounded-lg shadow mb-6">
             <div className="flex justify-between items-center">
-              <div className="flex-1">
+              <div className="flex-1 max-w-2xl">
                 <input
                   type="text"
                   placeholder="Search..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
                   className="w-full px-4 py-2 border rounded-md"
                 />
               </div>
               <div className="flex space-x-4 ml-4">
-                <button className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
-                  Owners (2)
-                </button>
-                <button className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
-                  Status (4)
-                </button>
+                <OwnerFilterDropdown
+                  selectedEmails={selectedOwners}
+                  onChange={setSelectedOwners}
+                />
               </div>
             </div>
           </div>
 
+          {/* Records list */}
           <div className="bg-white rounded-lg shadow mt-4">
             <RecordList
               records={records}
@@ -108,6 +130,7 @@ const Home: NextPage = () => {
         </div>
       </main>
 
+      {/* Add Question Modal */}
       <Modal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}

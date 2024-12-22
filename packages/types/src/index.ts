@@ -39,3 +39,8 @@ export interface Auth0User {
   last_login?: string;
   email_verified: boolean;
 }
+
+export interface RecordFilters {
+  assignedTo?: string[];
+  searchQuery?: string;
+}

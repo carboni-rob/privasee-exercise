@@ -1,4 +1,4 @@
-import { RecordIn, RecordOut } from "@privasee/types";
+import { RecordFilters, RecordIn, RecordOut } from "@privasee/types";
 import { airtable } from "../config/airtable";
 
 export class RecordService {
@@ -12,17 +12,50 @@ export class RecordService {
     return RecordService.instance;
   }
 
-  public async getAllRecords(): Promise<RecordOut[]> {
+  public async getAllRecords(filters?: RecordFilters): Promise<RecordOut[]> {
     try {
-      console.log("Fetching all records from Airtable...");
+      console.log("Fetching records with filters:", filters);
+
+      let filterFormula = "";
+
+      if (filters) {
+        const conditions = [];
+
+        // Filter by assigned users
+        if (filters.assignedTo && filters.assignedTo.length > 0) {
+          const assigneeConditions = filters.assignedTo.map(
+            (email) => `{assignedTo} = '${email}'`
+          );
+          conditions.push(`OR(${assigneeConditions.join(",")})`);
+        }
+
+        // Search in question or description
+        if (filters.searchQuery) {
+          conditions.push(
+            `OR(
+              SEARCH(LOWER('${filters.searchQuery}'), LOWER({question})),
+              SEARCH(LOWER('${filters.searchQuery}'), LOWER({answer}))
+            )`
+          );
+        }
+
+        // Combine all conditions with AND
+        if (conditions.length > 0) {
+          filterFormula = `AND(${conditions.join(",")})`;
+        }
+      }
+
+      const selectConfig: any = {
+        sort: [{ field: "_recordId", direction: "desc" }],
+      };
+
+      if (filterFormula) {
+        selectConfig.filterByFormula = filterFormula;
+      }
 
       const records = await airtable("questions_answers")
-        .select({
-          sort: [{ field: "_recordId", direction: "desc" }],
-        })
+        .select(selectConfig)
         .all();
-
-      console.log(`Found ${records.length} records`);
 
       return records.map((record) => ({
         _recordId: record.get("_recordId") as number,

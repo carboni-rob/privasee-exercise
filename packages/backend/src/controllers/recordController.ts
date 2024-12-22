@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { RecordService } from "../services/recordService";
+import { RecordFilters } from "@privasee/types";
 
 export class RecordController {
   private recordService: RecordService;
@@ -70,7 +71,14 @@ export class RecordController {
 
   public async getAllRecords(req: Request, res: Response): Promise<void> {
     try {
-      const records = await this.recordService.getAllRecords();
+      const filters: RecordFilters = {
+        assignedTo: req.query.assignedTo
+          ? (req.query.assignedTo as string).split(",")
+          : undefined,
+        searchQuery: req.query.search as string,
+      };
+
+      const records = await this.recordService.getAllRecords(filters);
       res.status(200).json(records);
     } catch (error) {
       console.error("Error fetching records:", error);
