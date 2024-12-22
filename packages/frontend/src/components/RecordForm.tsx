@@ -205,7 +205,7 @@ const RecordForm = ({ onSuccess }: RecordFormProps) => {
           type="submit"
           className="w-full px-4 py-2 text-white bg-blue-600 hover:bg-blue-700 rounded-md"
         >
-          Create Record
+          Create Question
         </button>
       </div>
     </form>
