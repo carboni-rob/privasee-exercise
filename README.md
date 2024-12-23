@@ -6,6 +6,10 @@ The app uses Auth0 for users authentication. Any user should be able to access w
 or register with an email and password.
 If logging in is prevented by Auth0, please email carboni@robertocarboni.it
 
+## Disclaimer
+
+This code is the work of the Author (Roberto Carboni) in collaboration with Anthropic's Claude using the Sonnet 3.5 model.
+
 ## Prerequisites
 
 - Node.js (v16 or higher)
